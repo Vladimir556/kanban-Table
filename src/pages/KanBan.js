@@ -2,18 +2,28 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
 import CloseSVG from '../components/svg/CloseSVG';
 import { v4 as uuidv4 } from 'uuid';
-import { AuthContext } from '../context';
+import { AuthContext, NotyfContext } from '../context';
 import axios from 'axios'
 import KanbanCard from '../components/Kanban/KanbanCard';
 import { Notyf } from 'notyf';
 
 const KanBan = () => {
 
-    const notyf = new Notyf();
     const [flag,setFlag] = useState(true)
     const {username, setUsername} = useContext(AuthContext)
+    const notyf = useContext(NotyfContext)
     const [columns,setColumns] = useState({})
     const socket = useRef()
+
+    const NotyfInfo = (msg, color = "#027dc5") => {
+        notyf.success({
+            message:msg,
+            icon: false,
+            background:"#027dc5",
+            dismissible:true
+        })
+    }
+
     const onDragEnd = (result, columns, setColumns) => {
         if (!result.destination) return;
         const { source, destination } = result;
@@ -68,13 +78,7 @@ const KanBan = () => {
             switch (msg.method) {
                 case "connection":
                     console.log(`user ${msg.username} connected!`)
-                    notyf.success({
-                        message:`${msg.username} connected!`,
-                        icon: false,
-                        background:"#027dc5",
-                        dismissible:true
-                    }
-                        )
+                    NotyfInfo(`${msg.username} connected!`)
                     break
                 case "kanban":
                     onUpdateKanbanHandler(msg)
@@ -110,6 +114,7 @@ const KanBan = () => {
 
     const onColumnDeleteClickHander = (columnId) => {
         const newColumns = columns
+        NotyfInfo(`column ${newColumns[columnId].name} has been removed`)
         delete newColumns[columnId]
         setColumns({...newColumns})
     }
@@ -224,7 +229,7 @@ const KanBan = () => {
                                             );
                                             })}
                                             <div className='kanban_addItem' onClick={() => onCardAddClickHander(columnId)}>
-                                                <CloseSVG fill='#56b5b8'/>
+                                                <CloseSVG fill='#027dc5'/>
                                             </div>
                                             {provided.placeholder}
                                         </div>
@@ -237,7 +242,7 @@ const KanBan = () => {
                             })}
                             <div className='kanban_addtable'>
                                 <div className='kanban_addtable_item' onClick={() => onColumnAddClickHander()}>
-                                    <CloseSVG fill='#777'/>
+                                    <CloseSVG fill='#027dc5'/>
                                 </div>
                             </div>
                     </DragDropContext>

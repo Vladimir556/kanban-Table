@@ -25,7 +25,7 @@ const Navbar = ({...props}) => {
                     <div className="contact">
                         <div className="contact_name">{username}</div>
                         <img className={dropdown ? "contact_caret  contact_caret_active" : "contact_caret"} src={caretSvg} alt="caret" onClick={() => setDropdown(!dropdown)}/>
-                        <div className={dropdown ? 'dropdown dropdown_active' : 'dropdown'} onMouseLeave={() => setDropdown(false)}>
+                        <div className={dropdown ? 'dropdown dropdown_active' : 'dropdown'} onMouseLeave={() => setDropdown(false)} >
                             <ul>
                                 <li><Link className='dropdown_item' to={'kanban'}>Profile</Link></li>
                                 <li><Link className='dropdown_item' to={'kanban'}>KanBan</Link></li>

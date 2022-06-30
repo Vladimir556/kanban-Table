@@ -538,7 +538,7 @@ body{
       transform: rotate(45deg);
     }
     &_item{
-      background-color: #8eecbb;
+      background-color: $color-gray-light;
       padding: 10px;
       display: flex;
       align-items: center;
@@ -546,13 +546,13 @@ body{
       border-radius: 15px;
       border: 2px solid white;
       &:hover{
-        background-color: #56b5b8;
+        background-color: $color-blue-light;
         cursor: pointer;
       }
     }
   }
   &_addItem{
-    border: 2px dashed #56b5b8;
+    border: 2px dashed $color-blue;
     display: flex;
     opacity: 0;
     align-items: center;
@@ -560,7 +560,7 @@ body{
     padding: 15px;
     &:hover{
       cursor: pointer;
-      background-color: #8eecbb;
+      background-color: $color-blue-light;
     }
     svg{
       width: 35px;
@@ -578,5 +578,34 @@ body{
     min-height: 50px;
     background: white;
     width: 100%;
+  }
+}
+
+/* 992 - 1200 */
+@media screen and (max-width: 1200px) {
+
+}
+
+/* 768 - 992 */
+@media screen and (max-width: 992px){
+  .login_form{
+    width: 100%;
+    border-radius: 0px;
+  }
+}
+
+/* 576 - 768  */
+@media screen and (max-width: 768px){
+
+}
+
+/* 0 - 576 */
+@media screen and (max-width: 576px){
+  .kanban{
+    &_column{
+      &_content{
+        width: 80vw;
+      }
+    }
   }
 }
