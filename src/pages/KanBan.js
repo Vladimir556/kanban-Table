@@ -5,8 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthContext } from '../context';
 import axios from 'axios'
 import KanbanCard from '../components/Kanban/KanbanCard';
+import { Notyf } from 'notyf';
+
 const KanBan = () => {
 
+    const notyf = new Notyf();
     const [flag,setFlag] = useState(true)
     const {username, setUsername} = useContext(AuthContext)
     const [columns,setColumns] = useState({})
@@ -53,6 +56,7 @@ const KanBan = () => {
         socket.current = new WebSocket(`ws://localhost:5000/`)
         socket.current.onopen = () => {
             console.log('Подключение установлено')
+            notyf.success('Подключение установлено')
             socket.current.send(JSON.stringify({
                 id: 1337,
                 username: username,
@@ -64,6 +68,13 @@ const KanBan = () => {
             switch (msg.method) {
                 case "connection":
                     console.log(`user ${msg.username} connected!`)
+                    notyf.success({
+                        message:`${msg.username} connected!`,
+                        icon: false,
+                        background:"#027dc5",
+                        dismissible:true
+                    }
+                        )
                     break
                 case "kanban":
                     onUpdateKanbanHandler(msg)
@@ -82,6 +93,7 @@ const KanBan = () => {
                 }
                 else{
                     console.log('kanbanData is empty')
+                    notyf.error('kanbanData is empty')
                 }
             })
     }
@@ -121,7 +133,7 @@ const KanBan = () => {
             }
         })
     }
-    
+
     useEffect( () => {
         onPageLoaded()
         webSocketStart()

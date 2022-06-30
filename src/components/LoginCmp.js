@@ -1,11 +1,11 @@
 import React, { useContext, useRef } from 'react';
 import axios from 'axios'
-import { AuthContext } from '../context';
+import { AuthContext, NotyfContext } from '../context';
 
 const LoginCmp = ({isShowLogin = false,isShowRegistation,setIsShowLogin,setIsShowRegistation}) => {
     
     const {username, setUsername} = useContext(AuthContext)
-
+    const notyf = useContext(NotyfContext)
     const email = useRef()
     const password = useRef()
 
@@ -23,9 +23,18 @@ const LoginCmp = ({isShowLogin = false,isShowRegistation,setIsShowLogin,setIsSho
                 if(response.data.status){
                     setUsername(email.current.value)
                     localStorage.setItem('username', email.current.value)
+                    notyf.success({
+                        message:'successfully logged in',
+                        duration: 3000,
+                        dismissible:true
+                    })
                 }
                 else{
-                    alert('user not exist')
+                    notyf.error({
+                        message:'user not exist',
+                        duration: 3000,
+                        dismissible:true
+                    })
                 }
             })
     }

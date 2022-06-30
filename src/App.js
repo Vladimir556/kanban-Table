@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import './App.css';
 import Navbar from './components/Navbar';
-import { AuthContext } from './context';
+import { AuthContext, NotyfContext } from './context';
+import { Notyf } from 'notyf';
+// pages
 import KanBan from './pages/KanBan';
 import KanbanManager from './pages/KanbanManager';
 import Login from './pages/Login';
 import Page404 from './pages/Page404';
 
 function App() {
+  
   const [username, setUsername] = useState(localStorage['username'])
+  const notyf = new Notyf()
   return (
-    <AuthContext.Provider value={{
+    <NotyfContext.Provider value={
+      notyf
+    }>
+      <AuthContext.Provider value={{
       username,
       setUsername
     }}>
@@ -37,6 +44,7 @@ function App() {
         </div>
       </BrowserRouter>
     </AuthContext.Provider>
+    </NotyfContext.Provider>
   );
 }
 

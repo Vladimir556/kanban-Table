@@ -163,6 +163,7 @@ body{
 /* форма авторизации*/
 .gradient_background{
   position:absolute;
+  z-index: 99;
   top: 0;
   left:0;
   min-width: 100vw;
@@ -175,6 +176,7 @@ body{
 }
 .login_form{
   position: absolute;
+  z-index: 100;
   top:0;
   right: -100vw;
   border-top-left-radius: 20px;
