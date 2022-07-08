@@ -71,6 +71,7 @@ const KanbanCard = ({
             onChange={(e) => setCardName(e.currentTarget.value)}
             onBlur={() => onUpdateCardHandler()}
             />
+            <img className='kanban_card_image' src='https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg'/>
             <textarea type="textarea" className='kanban_card_text' value={cardText}
             onChange={(e) => setCardText(e.currentTarget.value)}
             onBlur={() => onUpdateCardHandler()}
