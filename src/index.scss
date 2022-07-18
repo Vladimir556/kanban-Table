@@ -57,108 +57,6 @@ body{
   }
   }
 
-// .wrapper_common{
-//   height: 100vh;
-// }
-// .wrapper{
-//   height: 100vh;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// }
-// .wrapper_login{
-//   height: 100vh;
-// }
-
-// .card{
-//   margin: 0 20px;
-//   width: 300px;
-//   background-color: white;
-//   border-radius: 10px;
-//   position: relative;
-//   box-shadow: 0 2px 8px 1px rgb(64 60 67 / 24%);
-//   border-color: rgba(223,225,229,0);
-// }
-// .card:hover .photo__container .photo{
-//   top:-50px;
-//   width: 150px;
-//   height: 150px;
-// }
-// .card:hover .photo__container .photo_name{
-//   visibility: hidden;
-//   opacity: 0;
-// }
-// .photo__container{
-//   display: flex;
-//   justify-content: center;
-//   height: 100px;
-// }
-// .photo{
-//   position: absolute;
-//   top: 0px;
-//   width: 100%;
-//   height: 100%;
-//   background-color: red;
-//   border-radius: 10px;
-//   /* background: url("../img/photo.jpg"); */
-//   background-position: 53% 40%;
-//   background-repeat: no-repeat;
-//   border: 2px solid white;
-//   transition: all 1s ease;
-// }
-// .photo_name{
-//   position: absolute;
-//   top: 0px;
-//   right: 0px;
-//   padding: 10px 15px;
-//   border-end-start-radius: 10px;
-//   border-top-right-radius: 10px;
-//   background-color: white;
-//   transition: all 0.5s ease;
-// }
-// .info{
-//   padding-top: 15px;
-//   text-align: center;
-// }
-// .name{
-//   font-size: 20px;
-//   font-weight: bold;
-// }
-// .spec{
-//   padding: 0;
-//   margin: 0;
-//   margin-top: -5px;
-//   font-size: 12px;
-//   color:#777;
-// }
-// .info__group{
-//   width: 100%;
-//   display: flex;
-//   justify-content: space-between;
-  
-// }
-// .info__group__item{
-//   padding: 20px 20px;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   width: 33.3%;
-//   text-transform: uppercase;
-//   text-align: center;
-// }
-// .info__group__itemCount{
-//   font-size: 15px;
-//   font-weight: bold;
-// }
-// .info__group__itemLabel{
-//   font-weight: bold;
-//   font-size: 12px;
-//   color: #777;
-// }
-// .button__group{
-//   width: 100%;
-//   text-align: center;
-// }
 
 /* форма авторизации*/
 .gradient_background{
@@ -410,7 +308,8 @@ body{
     display: flex;
     flex-direction: row;
     width: 100%;
-    overflow-y: auto;
+    min-height: 80vh;
+    overflow-y: hidden;
     overflow-x: auto;
     &::-webkit-scrollbar{
       height: 6px;
@@ -424,7 +323,7 @@ body{
       border-right: 2px solid white;
       padding: 4px;
       width: 250px;
-      min-height: 70vh;
+      min-height: calc(100% - 70px);
     }
     &_name{
       position: relative;
