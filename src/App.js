@@ -29,7 +29,7 @@ function App() {
           {
             username ? 
             <>
-            <Route path="kanban" element={<KanbanManager/>}/>
+            <Route path="kanban" element={<KanBan/>}/>
             <Route path="kanban/:id" element={<KanBan/>}/>
             <Route path="*" element={<Page404/>}/>
             </>
