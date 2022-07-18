@@ -4,17 +4,17 @@ import CloseSVG from '../components/svg/CloseSVG';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthContext, NotyfContext } from '../context';
 import axios from 'axios'
-import KanbanCard from '../components/Kanban/KanbanCard';
-import { Notyf } from 'notyf';
+import Card from '../components/Kanban/Card';
 
 const KanBan = () => {
 
+    const [isDragAllow, setIsDragAllow] = useState(false)
     const [flag,setFlag] = useState(true)
     const {username, setUsername} = useContext(AuthContext)
     const notyf = useContext(NotyfContext)
     const [columns,setColumns] = useState({})
     const socket = useRef()
-
+    
     const NotyfInfo = (msg, color = "#027dc5") => {
         notyf.success({
             message:msg,
@@ -24,46 +24,73 @@ const KanBan = () => {
         })
     }
 
+    const onDragStart = (result) => {
+        if(result.source.droppableId == "board"){
+            setIsDragAllow(false)
+        }
+        else{
+            setIsDragAllow(true)
+        } 
+    }
+
     const onDragEnd = (result, columns, setColumns) => {
         if (!result.destination) return;
         const { source, destination } = result;
-      
-        if (source.droppableId !== destination.droppableId) {
-          const sourceColumn = columns[source.droppableId];
-          const destColumn = columns[destination.droppableId];
-          const sourceItems = [...sourceColumn.items];
-          const destItems = [...destColumn.items];
-          const [removed] = sourceItems.splice(source.index, 1);
-          destItems.splice(destination.index, 0, removed);
-          
-          setColumns({
-            ...columns,
-            [source.droppableId]: {
-              ...sourceColumn,
-              items: sourceItems
-            },
-            [destination.droppableId]: {
-              ...destColumn,
-              items: destItems
+        if(source.droppableId !== "board"){
+            if (source.droppableId !== destination.droppableId) {
+            const sourceColumn = columns[source.droppableId];
+            const destColumn = columns[destination.droppableId];
+            const sourceItems = [...sourceColumn.items];
+            const destItems = [...destColumn.items];
+            const [removed] = sourceItems.splice(source.index, 1);
+            destItems.splice(destination.index, 0, removed);
+            
+            setColumns({
+                ...columns,
+                [source.droppableId]: {
+                ...sourceColumn,
+                items: sourceItems
+                },
+                [destination.droppableId]: {
+                ...destColumn,
+                items: destItems
+                }
+            });
+            } else {
+            const column = columns[source.droppableId];
+            const copiedItems = [...column.items];
+            const [removed] = copiedItems.splice(source.index, 1);
+            copiedItems.splice(destination.index, 0, removed);
+            setColumns({
+                ...columns,
+                [source.droppableId]: {
+                ...column,
+                items: copiedItems
+                }
+            });
             }
-          });
         } else {
-          const column = columns[source.droppableId];
-          const copiedItems = [...column.items];
-          const [removed] = copiedItems.splice(source.index, 1);
-          copiedItems.splice(destination.index, 0, removed);
-          setColumns({
-            ...columns,
-            [source.droppableId]: {
-              ...column,
-              items: copiedItems
+            if(source.index !== destination.index){
+                let destID
+                Object.entries(columns).forEach(([key,value], ind) => {
+                    if(ind == destination.index)
+                    destID = key
+                })
+                setColumns({
+                    ...columns,
+                    [result.draggableId]:{
+                        ...columns[destID]
+                    },
+                    [destID]:{
+                        ...columns[result.draggableId]
+                    }
+                })
             }
-          });
         }
       };
     
     const webSocketStart = () => {
-        socket.current = new WebSocket(`ws://localhost:5000/`)
+        socket.current = new WebSocket(`ws://${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}/`)
         socket.current.onopen = () => {
             console.log('Подключение установлено')
             notyf.success('Подключение установлено')
@@ -89,7 +116,7 @@ const KanBan = () => {
     const onPageLoaded = async () => {
         await axios({
             method: 'get',
-            url: 'http://localhost:5000/getKanban',
+            url: `http://${process.env.REACT_APP_SERVER_URL}:${process.env.REACT_APP_SERVER_PORT}/getKanban`,
         })
             .then(response => {
                 if(response.data.status){
@@ -172,80 +199,148 @@ const KanBan = () => {
                 </div>
                 <div className='kanban_table'>
                     { columns ? 
-                        <DragDropContext onDragEnd={(result) => onDragEnd(result, columns, setColumns)}>
-                            {Object.entries(columns).map(([columnId, column], index) => {
-                            return (
-                                <div
-                                style={{
-                                    height: '100%',
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                }}
-                                key={columnId}
-                                >
-                                    {/* одна колонка */}
-                                <div style={{ margin: 8, height: '100%'}} className="kanban_column"> 
-                                    <p style={{userSelect: "none"}} className='kanban_column_name'><input type='text' value={column.name}
-                                        onChange={(e) => onColumnNameChangeHandler(e, columnId)}
-                                    />
-                                    <CloseSVG fill='#777' onClick={() => onColumnDeleteClickHander(columnId)}/>
-                                    </p>
-                                    <Droppable droppableId={columnId} key={columnId}>
-                                    {(provided, snapshot) => {
-                                        return (
-                                        <div
-                                            {...provided.droppableProps}
-                                            ref={provided.innerRef}
-                                            className='kanban_column_content'
-                                            style={{
-                                                background: snapshot.isDraggingOver
-                                                ? "#add8e6a9"
-                                                : "#d3d3d380"
+                        <DragDropContext onBeforeDragStart={(result) => onDragStart(result)} onDragEnd={(result) => onDragEnd(result, columns, setColumns)}>
+                            <Droppable droppableId='board' direction='horizontal' isDropDisabled={isDragAllow}>
+                                {(providedBoadrd) => (
+                                    <div style={{
+                                        display: "flex"
+                                        }}
+                                        ref={providedBoadrd.innerRef}
+                                        {...providedBoadrd.droppableProps}
+                                    >
+                                    {Object.entries(columns).map(([columnId, column], index) => {
+                                    return (
+                                        <Draggable draggableId={columnId} index={index} key={columnId}>
+                                            {(providedCol,snapshotCol) => {
+                                                return (
+                                                    <div
+                                                    style={{
+                                                        ...providedCol.draggableProps.style
+                                                        }}
+                                                    ref={providedCol.innerRef}
+                                                    {...providedCol.draggableProps}
+                                                    {...providedCol.dragHandleProps}
+                                                    
+                                                    //key={columnId}
+                                                    className="kanban_column"
+                                                    >
+                                                        <div style={{ margin: 8, height: '100%'}} className="kanban_column"> 
+                                                            <p style={{userSelect: "none"}} className="kanban_column_name">
+                                                                {column.name}
+                                                                <CloseSVG fill='#777' onClick={() => onColumnDeleteClickHander(columnId)}/>
+                                                            </p>
+                                                            <Droppable droppableId={columnId} isDropDisabled={!isDragAllow}>
+                                                            {(provided, snapshot) => {
+                                                                return (
+                                                                <div
+                                                                    {...provided.droppableProps}
+                                                                    ref={provided.innerRef}
+                                                                    className='kanban_column_content'
+                                                                    style={{
+                                                                        background: snapshot.isDraggingOver
+                                                                        ? "#add8e6a9"
+                                                                        : "#d3d3d380"
+                                                                    }}
+                                                                >
+                                                                    {column.items.map((item, index) => {
+                                                                    return (
+                                                                        <Card 
+                                                                        columns={columns}
+                                                                        setColumns={setColumns}
+                                                                        column={column}
+                                                                        columnId={columnId}
+                                                                        item={item}
+                                                                        index={index}
+                                                                        />
+                                                                    );
+                                                                    })}
+                                                                    <div className='kanban_addItem' onClick={() => onCardAddClickHander(columnId)}>
+                                                                        <CloseSVG fill='#027dc5'/>
+                                                                    </div>
+                                                                    {provided.placeholder}
+                                                                </div>
+                                                                );
+                                                            }}
+                                                            </Droppable>
+                                                        </div>
+                                                    </div>
+                                                )
                                             }}
-                                        >
-                                            {column.items.map((item, index) => {
-                                            return (
-                                                <Draggable
-                                                key={item.id}
-                                                draggableId={item.id}
-                                                index={index}
-                                                >
-                                                {(provided, snapshot) => {
-                                                    return (
-                                                        //! одна карточка
-                                                        <KanbanCard
-                                                        provided={provided}
-                                                        snapshot={snapshot}
-                                                        columns={columns}
-                                                        setColumns={setColumns}
-                                                        column={column}
-                                                        columnId={columnId}
-                                                        item={item}
-                                                        index={index}/>
-                                                    );
-                                                }}
-                                                </Draggable>
-                                            );
-                                            })}
-                                            <div className='kanban_addItem' onClick={() => onCardAddClickHander(columnId)}>
-                                                <CloseSVG fill='#027dc5'/>
-                                            </div>
-                                            {provided.placeholder}
-                                        </div>
-                                        );
-                                    }}
-                                    </Droppable>
-                                </div>
-                                </div>
-                            );
-                            })}
+                                        </Draggable>
+                                    );
+                                    })}
+                                    </div>
+                            )}
+                            </Droppable>
                             <div className='kanban_addtable'>
                                 <div className='kanban_addtable_item' onClick={() => onColumnAddClickHander()}>
                                     <CloseSVG fill='#027dc5'/>
                                 </div>
                             </div>
-                    </DragDropContext>
+                        </DragDropContext>
+                    //     <DragDropContext onBeforeDragStart={(result) => onDragStart(result)} onDragEnd={(result) => onDragEnd(result, columns, setColumns)}>
+                    //         {Object.entries(columns).map(([columnId, column], index) => {
+                    //         return (
+                    //             <div
+                    //             style={{
+                    //                 height: '100%',
+                    //                 display: "flex",
+                    //                 flexDirection: "column",
+                    //                 alignItems: "center",
+                    //             }}
+                    //             key={columnId}
+                    //             >
+                    //                 {/* одна колонка */}
+                    //             <div style={{ margin: 8, height: '100%'}} className="kanban_column"> 
+                    //                 <p style={{userSelect: "none"}} className='kanban_column_name'><input type='text' value={column.name}
+                    //                     onChange={(e) => onColumnNameChangeHandler(e, columnId)}
+                    //                 />
+                    //                 <CloseSVG fill='#777' onClick={() => onColumnDeleteClickHander(columnId)}/>
+                    //                 </p>
+                    //                 <Droppable droppableId={columnId} key={columnId}>
+                    //                 {(provided, snapshot) => {
+                    //                     return (
+                    //                     <div
+                    //                         {...provided.droppableProps}
+                    //                         ref={provided.innerRef}
+                    //                         className='kanban_column_content'
+                    //                         style={{
+                    //                             background: snapshot.isDraggingOver
+                    //                             ? "#add8e6a9"
+                    //                             : "#d3d3d380"
+                    //                         }}
+                    //                     >
+                    //                         {column.items.map((item, index) => {
+                    //                         return (
+                    //                             <Card
+                    //                                 provided={provided}
+                    //                                 snapshot={snapshot}
+                    //                                 columns={columns}
+                    //                                 setColumns={setColumns}
+                    //                                 column={column}
+                    //                                 columnId={columnId}
+                    //                                 item={item}
+                    //                                 index={index}/>
+                    //                         );
+                    //                         })}
+                    //                         <div className='kanban_addItem' onClick={() => onCardAddClickHander(columnId)}>
+                    //                             <CloseSVG fill='#027dc5'/>
+                    //                         </div>
+                    //                         {provided.placeholder}
+                    //                     </div>
+                    //                     );
+                    //                 }}
+                    //                 </Droppable>
+                    //             </div>
+                    //             </div>
+                    //         );
+                    //         })}
+                    //         <div className='kanban_addtable'>
+                    //             <div className='kanban_addtable_item' onClick={() => onColumnAddClickHander()}>
+                    //                 <CloseSVG fill='#027dc5'/>
+                    //             </div>
+                    //         </div>
+                    // </DragDropContext>
                     : <></>
                     }       
                 </div>

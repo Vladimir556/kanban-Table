@@ -7,7 +7,7 @@ import { Notyf } from 'notyf';
 // pages
 import KanBan from './pages/KanBan';
 import KanbanManager from './pages/KanbanManager';
-import Login from './pages/Login';
+import Auth from './pages/Auth';
 import Page404 from './pages/Page404';
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
             </>
             :
             <>
-            <Route path="login" element={<Login/>}/>
+            <Route path="login" element={<Auth/>}/>
             <Route path="*" element={<Navigate to='login' replace/>}/>
             </>
           }
